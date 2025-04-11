@@ -12,5 +12,6 @@ set(SFML_DIR "C:/Users/krist/SFML-2.5.1/lib/cmake/SFML")
 
 find_package(SFML 2.5 COMPONENTS system window graphics audio REQUIRED)
 
-add_executable(project3 main.cpp)
+add_executable(project3 main.cpp
+        welcome_window.cpp)
 target_link_libraries(project3 sfml-system sfml-window sfml-graphics sfml-audio)
