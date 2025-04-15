@@ -1,3 +1,4 @@
+#include "game_window.h"
 #include "welcome_window.h"
 
 int main() {
@@ -64,18 +65,21 @@ int main() {
         window.display();
     }
 
-    sf::RenderWindow Gamewindow(sf::VideoMode(colCount * 32, (rowCount * 32) + 100), "Game Screen", sf::Style::Close);
+    sf::RenderWindow Gamewindow(sf::VideoMode(colCount * 32.0f, (rowCount * 32.0f) + 100.0f), "Minesweeper", sf::Style::Close);
+    Game_Window game_window;
+    game_window.initializeMines(num_of_mines, colCount, rowCount);
 
     while (Gamewindow.isOpen()) {
-        sf::Event event;
-        while(Gamewindow.pollEvent(event)) {
-            if(event.type == sf::Event::Closed) {
+        sf::Event gameEvent;
+        while(Gamewindow.pollEvent(gameEvent)) {
+            if(gameEvent.type == sf::Event::Closed) {
                 Gamewindow.close();
                 return 1;
             }
         }
 
-        Gamewindow.clear();
+        Gamewindow.clear(sf::Color::White);
+        game_window.draw(Gamewindow, colCount, rowCount);
         Gamewindow.display();
     }
 
