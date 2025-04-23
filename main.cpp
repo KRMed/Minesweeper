@@ -72,10 +72,37 @@ int main() {
     while (Gamewindow.isOpen()) {
         sf::Event gameEvent;
         while(Gamewindow.pollEvent(gameEvent)) {
+
             if(gameEvent.type == sf::Event::Closed) {
                 Gamewindow.close();
                 return 1;
             }
+
+
+            if (gameEvent.type == sf::Event::MouseButtonPressed && gameEvent.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2i position = sf::Mouse::getPosition(Gamewindow);
+                game_window.updateDebug(position.x, position.y);
+
+                if (!game_window.getTruePause()) {
+                    game_window.updatePause(position.x, position.y);
+                }
+
+                if (!game_window.getPause() && !game_window.getTruePause()) {
+                    game_window.updateTiles(position.x, position.y, colCount, rowCount);
+                }
+
+                game_window.reset(position.x, position.y, colCount, rowCount, num_of_mines);
+            }
+
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+                sf::Vector2i position = sf::Mouse::getPosition(Gamewindow);
+                game_window.updateFlag(position.x, position.y, colCount, rowCount);
+            }
+
+            if (game_window.winCheck()) {
+
+            }
+
         }
 
         Gamewindow.clear(sf::Color::White);
