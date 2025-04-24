@@ -3,12 +3,18 @@
 #include <map>
 #include <vector>
 #include <iostream>
+#include <chrono>
 #include <SFML/Graphics.hpp>
 #include <random>
 #include <cmath>
 
 class Game_Window {
     int minesNum = 50;
+    int flagNum = minesNum;
+    int seconds;
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+    std::chrono::seconds elapsed_before{0};
+    std::string str_flagNum;
     std::map<std::string, sf::Texture> textures;
     sf::Sprite mine_S;
     sf::Sprite face_happy_S;

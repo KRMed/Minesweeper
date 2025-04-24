@@ -132,6 +132,12 @@ void Game_Window::initializeMines(const float minecount, const float width, cons
     win = false;
     truepause = false;
     pause = false;
+    seconds = 0;
+    flagNum = minesNum;
+    elapsed_before = std::chrono::seconds(0);
+
+    //start time
+    start = std::chrono::system_clock::now();
 
     tiles.resize(width*height);
 
@@ -271,6 +277,57 @@ void Game_Window::draw(sf::RenderWindow& window, const float width, const float 
         }
     }
 
+    //Drawing counter for flag
+
+    if (flagNum < 0) {
+        digits_S.setTextureRect(sf::IntRect(10*21, 0, 21, 32));
+        digits_S.setPosition(12, 32 * (height + 0.5) + 16);
+        window.draw(digits_S);
+    }
+
+    str_flagNum = std::to_string(std::abs(flagNum));
+    while (str_flagNum.length() < 3) {
+        str_flagNum = "0" + str_flagNum;
+    }
+
+    for (int i=0; i < str_flagNum.size(); i++) {
+        const int digit = str_flagNum[i] - '0';
+
+        digits_S.setTextureRect(sf::IntRect(digit * 21, 0, 21, 32));
+        digits_S.setPosition(33 + i * 21, 32 * (height +0.5) + 16);
+
+        window.draw(digits_S);
+    }
+
+
+    seconds = 0;
+    if (!pause && !truepause) {
+        end = std::chrono::system_clock::now();
+        auto elapsed = end - start;
+        seconds = (elapsed_before + std::chrono::duration_cast<std::chrono::seconds>(elapsed)).count();
+    } else {
+        seconds = elapsed_before.count();
+    }
+
+    int minutes = seconds / 60;
+    digits_S.setTextureRect(sf::IntRect((minutes / 10) * 21, 0, 21, 32));
+    digits_S.setPosition((width * 32) - 97, 32 * (height + 0.5) + 16);
+    window.draw(digits_S);
+
+    digits_S.setTextureRect(sf::IntRect((minutes % 10) * 21, 0, 21, 32));
+    digits_S.setPosition((width * 32) - 76, 32 * (height + 0.5) + 16);
+    window.draw(digits_S);
+
+    // Seconds (start at (width * 32) - 54)
+    digits_S.setTextureRect(sf::IntRect((seconds / 10) * 21, 0, 21, 32));
+    digits_S.setPosition((width * 32) - 54, 32 * (height + 0.5) + 16);
+    window.draw(digits_S);
+
+    digits_S.setTextureRect(sf::IntRect((seconds % 10) * 21, 0, 21, 32));
+    digits_S.setPosition((width * 32) - 33, 32 * (height + 0.5) + 16);
+    window.draw(digits_S);
+
+
     debug_S.setPosition(width * 32 - 304, (height + 0.5) * 32);
     window.draw(debug_S);
 
@@ -295,6 +352,8 @@ void Game_Window::updateTiles(int x, int y, int width, int height) {
 
         if (tiles[y/32 * width + x/32].hasMine) {
             lose = true;
+            end = std::chrono::system_clock::now();
+            elapsed_before += std::chrono::duration_cast<std::chrono::seconds>(end - start);
             truepause = true;
             tiles[y/32 * width + x/32].isRevealed = true;
         }
@@ -309,8 +368,18 @@ void Game_Window::updateTiles(int x, int y, int width, int height) {
 }
 
 void Game_Window::updatePause(int x, int y) {
+    if (truepause) {
+        return;
+    }
     sf::FloatRect bounds = pause_S.getGlobalBounds();
     if (x >= bounds.left && x < bounds.left + bounds.width && y >= bounds.top && y < bounds.top + bounds.height) {
+
+        if (!pause) {
+            end = std::chrono::system_clock::now();
+            elapsed_before += std::chrono::duration_cast<std::chrono::seconds>(end - start);
+        } else {
+            start = std::chrono::system_clock::now();
+        }
         pause = !pause;
     }
 }
@@ -325,6 +394,12 @@ void Game_Window::reset(int x, int y, int width, int height, int mines) {
 void Game_Window::updateFlag(int x, int y, int width, int height) {
     if (y <= height * 32) {
         tiles[std::floor(y/32) * width + std::floor(x/32)].hasFlag = !tiles[std::floor(y/32) * width + std::floor(x/32)].hasFlag;
+
+        if (tiles[std::floor(y/32) * width + std::floor(x/32)].hasFlag) {
+            flagNum--;
+        } else {
+            flagNum++;
+        }
     }
 }
 
@@ -367,6 +442,9 @@ bool Game_Window::winCheck() {
             return false;
         }
     }
+
+    end = std::chrono::system_clock::now();
+    elapsed_before += std::chrono::duration_cast<std::chrono::seconds>(end - start);
 
     win = true;
     truepause = true;
