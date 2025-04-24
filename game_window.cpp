@@ -310,6 +310,7 @@ void Game_Window::draw(sf::RenderWindow& window, const float width, const float 
     }
 
     int minutes = seconds / 60;
+    seconds = seconds % 60;
     digits_S.setTextureRect(sf::IntRect((minutes / 10) * 21, 0, 21, 32));
     digits_S.setPosition((width * 32) - 97, 32 * (height + 0.5) + 16);
     window.draw(digits_S);
