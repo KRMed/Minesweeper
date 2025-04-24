@@ -96,7 +96,9 @@ int main() {
 
             if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
                 sf::Vector2i position = sf::Mouse::getPosition(Gamewindow);
-                game_window.updateFlag(position.x, position.y, colCount, rowCount);
+                if (!game_window.getPause() && !game_window.getTruePause()) {
+                    game_window.updateFlag(position.x, position.y, colCount, rowCount);
+                }
             }
 
             if (game_window.winCheck()) {
