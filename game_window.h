@@ -11,7 +11,7 @@
 class Game_Window {
     int minesNum = 50;
     int flagNum = minesNum;
-    int seconds;
+    int seconds{};
     std::chrono::time_point<std::chrono::system_clock> start, end;
     std::chrono::seconds elapsed_before{0};
     std::string str_flagNum;
